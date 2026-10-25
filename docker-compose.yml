@@ -41,8 +41,12 @@ services:
       DATABASE_URL: postgresql+asyncpg://app:${DB_PASSWORD}@web-db:5432/web_db
       JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env}
       RENDERERS: http://ray-worker-1:8080,http://ray-worker-2:8080
+      AUTOSCALE: "true"
+      AUTOSCALE_MIN: ${AUTOSCALE_MIN:-2}
+      AUTOSCALE_MAX: ${AUTOSCALE_MAX:-5}
     volumes:
       - images:/app/data
+      - /var/run/docker.sock:/var/run/docker.sock
     depends_on:
       web-db:
         condition: service_healthy

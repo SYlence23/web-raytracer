@@ -96,11 +96,7 @@ docker compose up --build
 | http://localhost:8000 | App (client served by the load balancer) |
 | http://localhost:8000/docs | Load balancer API docs |
 
-Run more workers manually:
-
-```bash
-docker compose up --scale ray-worker=4
-```
+Two workers always run. The load balancer starts more containers (`ray-worker-3`, `ray-worker-4`, ...) when tasks queue up and stops them once they are idle, between `AUTOSCALE_MIN` and `AUTOSCALE_MAX` from `.env` (2 and 5 by default). For that it gets the Docker socket mounted in `docker-compose.yml`.
 
 ---
 
