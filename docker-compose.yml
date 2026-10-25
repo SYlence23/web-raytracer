@@ -1,0 +1,56 @@
+x-ray-worker: &ray-worker
+  build: ./ray-worker
+  image: web-ray-worker
+  restart: unless-stopped
+
+services:
+  web-db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in .env}
+      POSTGRES_DB: web_db
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app -d web_db"]
+      interval: 2s
+      timeout: 3s
+      retries: 15
+
+  ray-worker-1:
+    <<: *ray-worker
+    environment:
+      Worker__Name: ray-worker-1
+      Worker__Capacity: 2
+
+  ray-worker-2:
+    <<: *ray-worker
+    environment:
+      Worker__Name: ray-worker-2
+      Worker__Capacity: 2
+
+  load-balancer:
+    build: ./load-balancer
+    image: web-load-balancer
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://app:${DB_PASSWORD}@web-db:5432/web_db
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env}
+      RENDERERS: http://ray-worker-1:8080,http://ray-worker-2:8080
+    volumes:
+      - images:/app/data
+    depends_on:
+      web-db:
+        condition: service_healthy
+      ray-worker-1:
+        condition: service_started
+      ray-worker-2:
+        condition: service_started
+
+volumes:
+  db-data:
+  images:

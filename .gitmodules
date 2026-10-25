@@ -1,0 +1,9 @@
+[submodule "client"]
+	path = client
+	url = https://github.com/SYlence23/web-client
+[submodule "ray-worker"]
+	path = ray-worker
+	url = https://github.com/SYlence23/web-ray-worker
+[submodule "load-balancer"]
+	path = load-balancer
+	url = https://github.com/SYlence23/web-load-balancer
