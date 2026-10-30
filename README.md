@@ -93,7 +93,8 @@ docker compose up --build
 
 | URL | What |
 |---|---|
-| http://localhost:8000 | App (client served by the load balancer) |
+| http://localhost:8080 | App (client served by nginx, which proxies `/api` to the load balancer) |
+| http://localhost:8000 | Load balancer API directly |
 | http://localhost:8000/docs | Load balancer API docs |
 
 Two workers always run. The load balancer starts more containers (`ray-worker-3`, `ray-worker-4`, ...) when tasks queue up and stops them once they are idle, between `AUTOSCALE_MIN` and `AUTOSCALE_MAX` from `.env` (2 and 5 by default). For that it gets the Docker socket mounted in `docker-compose.yml`.
@@ -171,13 +172,13 @@ web-raytracer/
 
 ## Roadmap
 
-- [ ] Ray tracer renders a PNG from the console
-- [ ] Worker API with progress and cancel, running in Docker (2 instances)
-- [ ] Load balancer: health checks, least-loaded dispatch, history in web-db
-- [ ] docker-compose brings up the whole system
-- [ ] React client: render form, live progress, history
-- [ ] JWT auth
-- [ ] Queue with wait estimate
-- [ ] Autoscaling
-- [ ] Admin panel
+- [x] Ray tracer renders a PNG from the console
+- [x] Worker API with progress and cancel, running in Docker (2 instances)
+- [x] Load balancer: health checks, least-loaded dispatch, history in web-db
+- [x] docker-compose brings up the whole system
+- [x] React client: render form, live progress, history
+- [x] JWT auth
+- [x] Queue with wait estimate
+- [x] Autoscaling
+- [x] Admin panel
 - [ ] *Backlog:* HTTPS

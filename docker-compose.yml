@@ -55,6 +55,15 @@ services:
       ray-worker-2:
         condition: service_started
 
+  client:
+    build: ./client
+    image: web-client
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    depends_on:
+      - load-balancer
+
 volumes:
   db-data:
   images:
