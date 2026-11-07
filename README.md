@@ -103,15 +103,15 @@ Two workers always run. The load balancer starts more containers (`ray-worker-3`
 
 The load balancer only talks to workers over HTTP, so a worker can run on any machine it can reach.
 
-**On the worker machine** (Docker installed, same network):
+**On the worker machine** (Docker installed, same network), only the worker repo is needed. It has its own `docker-compose.yml`:
 
 ```bash
-git clone --recurse-submodules https://github.com/<you>/web-raytracer
-cd web-raytracer
-WORKER_NAME=worker-pc2 docker compose -f docker-compose.worker.yml up --build -d
+git clone https://github.com/<you>/web-ray-worker
+cd web-ray-worker
+docker compose up --build -d
 ```
 
-This starts only `web-ray-worker` and publishes its port 8080. Check it from the main machine with `curl http://<worker-ip>:8080/health`. On Windows, allow inbound TCP 8080 in the firewall if the request times out.
+This starts one worker and publishes its port 8080. Its name, port and capacity can be set in a `.env` file there (see the worker README). Check it from the main machine with `curl http://<worker-ip>:8080/health`. On Windows, allow inbound TCP 8080 in the firewall if the request times out.
 
 **On the main machine**, list it in `.env` next to the local workers and restart the load balancer:
 
