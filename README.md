@@ -99,6 +99,29 @@ docker compose up --build
 
 Two workers always run. The load balancer starts more containers (`ray-worker-3`, `ray-worker-4`, ...) when tasks queue up and stops them once they are idle, between `AUTOSCALE_MIN` and `AUTOSCALE_MAX` from `.env` (2 and 5 by default). For that it gets the Docker socket mounted in `docker-compose.yml`.
 
+### Workers on other machines
+
+The load balancer only talks to workers over HTTP, so a worker can run on any machine it can reach.
+
+**On the worker machine** (Docker installed, same network):
+
+```bash
+git clone --recurse-submodules https://github.com/<you>/web-raytracer
+cd web-raytracer
+WORKER_NAME=worker-pc2 docker compose -f docker-compose.worker.yml up --build -d
+```
+
+This starts only `web-ray-worker` and publishes its port 8080. Check it from the main machine with `curl http://<worker-ip>:8080/health`. On Windows, allow inbound TCP 8080 in the firewall if the request times out.
+
+**On the main machine**, list it in `.env` next to the local workers and restart the load balancer:
+
+```bash
+RENDERERS=http://ray-worker-1:8080,http://ray-worker-2:8080,http://<worker-ip>:8080
+docker compose up -d load-balancer
+```
+
+The remote worker shows up in the admin panel and gets tasks like any other worker. The autoscaler never stops it, because it only manages containers it started itself, but it does count toward `AUTOSCALE_MAX`.
+
 ---
 
 ## docker-compose overview
