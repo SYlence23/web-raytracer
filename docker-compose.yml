@@ -24,12 +24,14 @@ services:
     environment:
       Worker__Name: ray-worker-1
       Worker__Capacity: 2
+      Worker__Token: ${WORKER_TOKEN:-}
 
   ray-worker-2:
     <<: *ray-worker
     environment:
       Worker__Name: ray-worker-2
       Worker__Capacity: 2
+      Worker__Token: ${WORKER_TOKEN:-}
 
   load-balancer:
     build: ./load-balancer
@@ -41,6 +43,7 @@ services:
       DATABASE_URL: postgresql+asyncpg://app:${DB_PASSWORD}@web-db:5432/web_db
       JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env}
       RENDERERS: ${RENDERERS:-http://ray-worker-1:8080,http://ray-worker-2:8080}
+      WORKER_TOKEN: ${WORKER_TOKEN:-}
       AUTOSCALE: "true"
       AUTOSCALE_MIN: ${AUTOSCALE_MIN:-2}
       AUTOSCALE_MAX: ${AUTOSCALE_MAX:-5}

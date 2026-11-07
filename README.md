@@ -111,7 +111,7 @@ cd web-ray-worker
 docker compose up --build -d
 ```
 
-This starts one worker and publishes its port 8080. Its name, port and capacity can be set in a `.env` file there (see the worker README). Check it from the main machine with `curl http://<worker-ip>:8080/health`. On Windows, allow inbound TCP 8080 in the firewall if the request times out.
+This starts one worker and publishes its port 8080. Its name, port, capacity and token are set in a `.env` file there (see the worker README). Put the same `WORKER_TOKEN` there as in this repo's `.env`: the load balancer sends it in the `X-Worker-Token` header, and a worker with a token rejects every request without it. That matters as soon as the worker is reachable from outside, for example through ngrok. Check it from the main machine with `curl -H "X-Worker-Token: <token>" http://<worker-ip>:8080/health`. On Windows, allow inbound TCP 8080 in the firewall if the request times out.
 
 **On the main machine**, list it in `.env` next to the local workers and restart the load balancer:
 
